@@ -10,3 +10,5 @@ cluster_sbatch_mpi.sh
 trained_agents/
 .git/
 .pytype/
+experiments/
+new_scripts/

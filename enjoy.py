@@ -9,6 +9,8 @@ warnings.filterwarnings("ignore", category=FutureWarning, module='tensorflow')
 warnings.filterwarnings("ignore", category=UserWarning, module='gym')
 
 import gym
+from gym import envs
+import toy_simulator
 import utils.import_envs  # pytype: disable=import-error
 import numpy as np
 import stable_baselines
@@ -94,6 +96,7 @@ def main():
                           stats_path=stats_path, seed=args.seed, log_dir=log_dir,
                           should_render=not args.no_render,
                           hyperparams=hyperparams, env_kwargs=env_kwargs)
+
 
     # ACER raises errors because the environment passed must have
     # the same number of environments as the model was trained on.

@@ -32,6 +32,26 @@ from stable_baselines.common.callbacks import CheckpointCallback, EvalCallback
 from stable_baselines.her import HERGoalEnvWrapper
 from stable_baselines.common.base_class import _UnvecWrapper
 
+#---------ADDED------------------------------------------------
+from stable_baselines.common.vec_env import VecVideoRecorder
+
+from gym import envs
+#import toy_simulator  #only for 2D custom toy environment
+import cv2
+cv2.ocl.setUseOpenCL(False)
+from stable_baselines.common.atari_wrappers import WarpFrame
+from stable_baselines.common.atari_wrappers import FrameStack
+
+
+import dVRL_simulator #only for dVRL
+from RGBobs import RGBobs
+
+
+#import dVRL_simulator2 #only for dVRL2
+
+from stable_baselines import logger
+#--------------------------------------------------------------
+
 from utils import make_env, ALGOS, linear_schedule, get_latest_run_id, get_wrapper_class
 from utils.hyperparams_opt import hyperparam_optimization
 from utils.callbacks import SaveVecNormalizeCallback
@@ -77,7 +97,24 @@ if __name__ == '__main__':
                         help='Ensure that the run has a unique ID')
     parser.add_argument('--env-kwargs', type=str, nargs='+', action=StoreDict,
                         help='Optional keyword argument to pass to the env constructor')
+    parser.add_argument('--log-path', help='log dir', default = '', type = str)
+    parser.add_argument('--save_video_interval', help='make a video every video_interval steps',
+                        default=200000, type=int)
+    parser.add_argument('--save_video_length', help='video length',
+                        default=2000, type=int)
     args = parser.parse_args()
+
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------
+    def configure_logger(log_path, **kwargs):
+        if log_path is not None:
+            logger.configure(log_path)
+        else:
+            logger.configure(**kwargs)
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
     # Going through custom gym packages to let them register in the global registory
     for env_module in args.gym_packages:
@@ -108,9 +145,18 @@ if __name__ == '__main__':
             "The trained_agent must be a valid path to a .zip/.pkl file"
 
     rank = 0
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+    configure_logger(args.log_path)
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
     if mpi4py is not None and MPI.COMM_WORLD.Get_size() > 1:
         print("Using MPI for multiprocessing with {} workers".format(MPI.COMM_WORLD.Get_size()))
         rank = MPI.COMM_WORLD.Get_rank()
+#----------------------------------------------------------------------------------------------------------------------------------------------
+        configure_logger(args.log_path, format_strs=[])
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
         print("Worker rank: {}".format(rank))
 
         args.seed += rank
@@ -249,10 +295,21 @@ if __name__ == '__main__':
         elif algo_ in ['dqn', 'ddpg']:
             if hyperparams.get('normalize', False):
                 print("WARNING: normalization not supported yet for DDPG/DQN")
+
+            #------------MODIFICATIONS--------------------------------------------------------------------
             env = gym.make(env_id, **env_kwargs)
+
             env.seed(args.seed)
             if env_wrapper is not None:
                 env = env_wrapper(env)
+
+
+            env = DummyVecEnv([lambda: env]) 
+            #print('size obs', env.observation_space.shape) # the result is (84,84,1) for both test and train environments
+            env = VecFrameStack(env, n_stack=4)
+            #---------------------------------------------------------------------------------------------
+
+
         else:
             if n_envs == 1:
                 env = DummyVecEnv([make_env(env_id, 0, args.seed, wrapper_class=env_wrapper, log_dir=log_dir, env_kwargs=env_kwargs)])
@@ -261,6 +318,8 @@ if __name__ == '__main__':
                 # On most env, SubprocVecEnv does not help and is quite memory hungry
                 env = DummyVecEnv([make_env(env_id, i, args.seed, log_dir=log_dir,
                                             wrapper_class=env_wrapper, env_kwargs=env_kwargs) for i in range(n_envs)])
+
+
             if normalize:
                 # Copy to avoid changing default values by reference
                 local_normalize_kwargs = normalize_kwargs.copy()
@@ -278,6 +337,7 @@ if __name__ == '__main__':
                         print("Normalizing input and reward")
                 env = VecNormalize(env, **local_normalize_kwargs)
 
+
         # Optional Frame-stacking
         if hyperparams.get('frame_stack', False):
             n_stack = hyperparams['frame_stack']
@@ -292,6 +352,8 @@ if __name__ == '__main__':
 
 
     env = create_env(n_envs)
+
+
     # Create test env if needed, do not normalize reward
     eval_env = None
     if args.eval_freq > 0 and not args.optimize_hyperparameters:
@@ -315,6 +377,8 @@ if __name__ == '__main__':
     # Stop env processes to free memory
     if args.optimize_hyperparameters and n_envs > 1:
         env.close()
+
+
 
     # Parse noise string for DDPG and SAC
     if algo_ in ['ddpg', 'sac', 'td3'] and hyperparams.get('noise_type') is not None:
@@ -345,8 +409,19 @@ if __name__ == '__main__':
         if 'noise_std_final' in hyperparams:
             del hyperparams['noise_std_final']
 
+
+
     if ALGOS[args.algo] is None:
         raise ValueError('{} requires MPI to be installed'.format(args.algo))
+
+
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    #if args.save_video_interval != 0:
+        #import pudb; pudb.set_trace()
+        #print('path', os.path.join(logger.get_dir(), "videos"))
+    #    env = VecVideoRecorder(env, os.path.join(logger.get_dir(), "videos"), record_video_trigger=lambda x: x % args.save_video_interval == 0, video_length=args.save_video_length)
+    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
     if os.path.isfile(args.trained_agent):
         # Continue training
@@ -400,6 +475,8 @@ if __name__ == '__main__':
         # Train an agent from scratch
         model = ALGOS[args.algo](env=env, tensorboard_log=tensorboard_log, verbose=args.verbose, **hyperparams)
 
+
+
     kwargs = {}
     if args.log_interval > -1:
         kwargs = {'log_interval': args.log_interval}
@@ -413,7 +490,9 @@ if __name__ == '__main__':
 
     print("Log path: {}".format(save_path))
 
+
     try:
+        #import pudb; pudb.set_trace()
         model.learn(n_timesteps, **kwargs)
     except KeyboardInterrupt:
         pass

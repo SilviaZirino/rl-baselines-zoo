@@ -2,10 +2,26 @@ import os
 import argparse
 
 import gym
+from gym import envs
+#import envs
 import numpy as np
+
+from skimage import transform
+from stable_baselines.common.atari_wrappers import WarpFrame
+
 from stable_baselines.common.vec_env import VecVideoRecorder, VecFrameStack, VecNormalize
 
 from .utils import ALGOS, create_test_env, get_saved_hyperparams, get_latest_run_id, find_saved_model
+
+
+#-----------------------------------------
+import dVRL_simulator
+from skimage import transform
+from gym.spaces import Box
+import cv2
+#from RGBobs import RGBobs
+#-----------------------------------------
+
 
 if __name__ == '__main__':
 
@@ -58,9 +74,22 @@ if __name__ == '__main__':
                           stats_path=stats_path, seed=seed, log_dir=None,
                           should_render=not args.no_render, hyperparams=hyperparams)
 
+    #env = RGBobs(env)
+
     model = ALGOS[algo].load(model_path)
 
+
     obs = env.reset()
+
+    #obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY) #ADDED 2
+    #obs = cv2.resize(obs, (84,84), interpolation=cv2.INTER_AREA) #ADDED 2
+
+
+    #obs_dummy = env.reset() #ADDED 1
+    #obs = transform.resize(obs_dummy, (84,84)) #ADDED 1
+    #env.observation_space = Box(low=0, high=255, shape=obs.shape, dtype=np.uint8) #ADDED 1
+    #obs = obs[:,:, None]*255 #ADDED 1
+
 
     # Note: apparently it renders by default
     env = VecVideoRecorder(env, video_folder,
