@@ -36,18 +36,14 @@ from stable_baselines.common.base_class import _UnvecWrapper
 from stable_baselines.common.vec_env import VecVideoRecorder
 
 from gym import envs
-#import toy_simulator  #only for 2D custom toy environment
 import cv2
 cv2.ocl.setUseOpenCL(False)
 from stable_baselines.common.atari_wrappers import WarpFrame
 from stable_baselines.common.atari_wrappers import FrameStack
 
-
-import dVRL_simulator #only for dVRL
+# import toy_simulator
+import dVRL_simulator
 from RGBobs import RGBobs
-
-
-#import dVRL_simulator2 #only for dVRL2
 
 from stable_baselines import logger
 #--------------------------------------------------------------

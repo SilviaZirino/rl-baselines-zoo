@@ -10,7 +10,9 @@ warnings.filterwarnings("ignore", category=UserWarning, module='gym')
 
 import gym
 from gym import envs
-import toy_simulator
+#import dVRL_simulator
+#import toy_simulator
+
 import utils.import_envs  # pytype: disable=import-error
 import numpy as np
 import stable_baselines

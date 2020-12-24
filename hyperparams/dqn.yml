@@ -81,7 +81,7 @@ CameraReach-v0:
 CameraReach-v1:
   env_wrapper: stable_baselines.common.atari_wrappers.WarpFrame
   policy: 'CnnPolicy'
-  n_timesteps: !!float 3.5e6
+  n_timesteps: !!float 5e6
   buffer_size: 10000
   learning_rate: !!float 1e-4
   learning_starts: 10000
