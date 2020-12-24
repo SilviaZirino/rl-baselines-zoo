@@ -3,7 +3,6 @@ import argparse
 
 import gym
 from gym import envs
-#import envs
 import numpy as np
 
 from skimage import transform
@@ -15,11 +14,12 @@ from .utils import ALGOS, create_test_env, get_saved_hyperparams, get_latest_run
 
 
 #-----------------------------------------
-import dVRL_simulator
+import toy_simulator
+#import dVRL_simulator
+
 from skimage import transform
 from gym.spaces import Box
 import cv2
-#from RGBobs import RGBobs
 #-----------------------------------------
 
 
