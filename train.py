@@ -41,8 +41,8 @@ cv2.ocl.setUseOpenCL(False)
 from stable_baselines.common.atari_wrappers import WarpFrame
 from stable_baselines.common.atari_wrappers import FrameStack
 
-# import toy_simulator
-import dVRL_simulator
+#import toy_simulator
+#import dVRL_simulator
 from RGBobs import RGBobs
 
 from stable_baselines import logger
