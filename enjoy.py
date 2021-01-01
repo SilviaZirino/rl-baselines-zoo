@@ -10,8 +10,8 @@ warnings.filterwarnings("ignore", category=UserWarning, module='gym')
 
 import gym
 from gym import envs
-import toy_simulator
-#import dVRL_simulator
+import dVRL_simulator
+
 
 import utils.import_envs  # pytype: disable=import-error
 import numpy as np
@@ -94,16 +94,20 @@ def main():
 
     env_kwargs = {} if args.env_kwargs is None else args.env_kwargs
 
+
+
     env = create_test_env(env_id, n_envs=args.n_envs, is_atari=is_atari,
                           stats_path=stats_path, seed=args.seed, log_dir=log_dir,
                           should_render=not args.no_render,
                           hyperparams=hyperparams, env_kwargs=env_kwargs)
 
 
+
     # ACER raises errors because the environment passed must have
     # the same number of environments as the model was trained on.
     load_env = None if algo == 'acer' else env
     model = ALGOS[algo].load(model_path, env=load_env)
+
 
     obs = env.reset()
 
