@@ -37,7 +37,7 @@ from stable_baselines.common.vec_env import VecVideoRecorder
 
 from gym import envs
 #import toy_simulator
-#import dVRL_simulator
+import dVRL_simulator
 from RGBobs import RGBobs
 
 import cv2
@@ -254,6 +254,11 @@ if __name__ == '__main__':
         del hyperparams['env_wrapper']
 
     log_path = "{}/{}/".format(args.log_folder, args.algo)
+
+#---------------PROVA-------------------------------------------
+    #log_path = "prova/ppo2/"
+#---------------------------------------------------------------
+
     save_path = os.path.join(log_path, "{}_{}{}".format(env_id, get_latest_run_id(log_path, env_id) + 1, uuid_str))
     params_path = "{}/{}".format(save_path, env_id)
     os.makedirs(params_path, exist_ok=True)
