@@ -73,7 +73,7 @@ if __name__ == '__main__':
                         default=5, type=int)
     parser.add_argument('--save-freq', help='Save the model every n steps (if negative, no checkpoint)',
                         default=-1, type=int)
-    parser.add_argument('-f', '--log-folder', help='Log folder', type=str, default='logs')
+    parser.add_argument('-f', '--log-folder', help='Log folder', type=str, default='new_logs')
     parser.add_argument('--seed', help='Random generator seed', type=int, default=0)
     parser.add_argument('--n-trials', help='Number of trials for optimizing hyperparameters', type=int, default=10)
     parser.add_argument('-optimize', '--optimize-hyperparameters', action='store_true', default=False,
@@ -253,11 +253,8 @@ if __name__ == '__main__':
     if 'env_wrapper' in hyperparams.keys():
         del hyperparams['env_wrapper']
 
-    log_path = "{}/{}/".format(args.log_folder, args.algo)
-
-#---------------PROVA-------------------------------------------
-    #log_path = "prova/ppo2/"
-#---------------------------------------------------------------
+    
+    log_path = "{}/{}/".format(args.log_folder, args.algo) 
 
     save_path = os.path.join(log_path, "{}_{}{}".format(env_id, get_latest_run_id(log_path, env_id) + 1, uuid_str))
     params_path = "{}/{}".format(save_path, env_id)
@@ -293,22 +290,30 @@ if __name__ == '__main__':
             env = make_atari_env(env_id, num_env=n_envs, seed=args.seed)
             # Frame-stacking with 4 frames
             env = VecFrameStack(env, n_stack=4)
-        elif algo_ in ['dqn', 'ddpg']:
+        #------------MODIFICATIONS--------------------------------------------------------------------
+        elif algo_ in ['dqn']:
             if hyperparams.get('normalize', False):
-                print("WARNING: normalization not supported yet for DDPG/DQN")
-
-            #------------MODIFICATIONS--------------------------------------------------------------------
+                print("WARNING: normalization not supported yet for DDPG/DQN")          
             env = gym.make(env_id, **env_kwargs)
 
             env.seed(args.seed)
             if env_wrapper is not None:
                 env = env_wrapper(env)
 
-
             env = DummyVecEnv([lambda: env]) 
-            #print('size obs', env.observation_space.shape) # the result is (84,84,1) for both test and train environments
+            ##print('size obs', env.observation_space.shape) # the result is (84,84,1) for both test and train environments
             env = VecFrameStack(env, n_stack=4)
-            #---------------------------------------------------------------------------------------------
+
+        elif algo_ in ['ddpg']:
+            if hyperparams.get('normalize', False):
+                print("WARNING: normalization not supported yet for DDPG/DQN")
+
+            env = gym.make(env_id, **env_kwargs)
+
+            env.seed(args.seed)
+            if env_wrapper is not None:
+                env = env_wrapper(env)
+        #---------------------------------------------------------------------------------------------
 
 
         else:
@@ -493,7 +498,6 @@ if __name__ == '__main__':
 
 
     try:
-        #import pudb; pudb.set_trace()
         model.learn(n_timesteps, **kwargs)
     except KeyboardInterrupt:
         pass
