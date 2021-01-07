@@ -345,15 +345,15 @@ MiniGrid-FourRooms-v0:
 CameraReach-v0:
   env_wrapper: RGBobs.RGBobs
   policy: 'CnnPolicy'
-  n_envs: 4 # try with smaller number of environments (batch size = n_steps*n_envs)
-  n_steps: 1024 #16
-  noptepochs: 10 #4
-  nminibatches: 64 #4
+  n_envs: 4 # try with smaller number of environments (batch size = n_steps*n_envs = 72)
+  n_steps: 18 #1024 #16
+  noptepochs: 5 #10 #4
+  nminibatches: 4 #64
   n_timesteps: !!float 5e6
-  learning_rate: lin_2.5e-4
-  cliprange: lin_0.1 #lin_0.4
-  vf_coef: 0.5
-  ent_coef: 0.0 #0.001
+  learning_rate: lin_1e-4 #lin_2.5e-4
+  cliprange: lin_0.2 #lin_0.1 #lin_0.4
+  vf_coef: 0.5 #critic discount??
+  ent_coef: 0.001 #0.0
   cliprange_vf: -1
   lam: 0.95 #0.8
   gamma: 0.99 #0.95
