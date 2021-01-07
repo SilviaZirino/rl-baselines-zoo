@@ -63,19 +63,20 @@ Toy2D-v0:
 
 
 CameraReach-v0:
-  env_wrapper: RGBobs.RGBobs
+  env_wrapper: RGBobs_ddpg.RGBobs #64x64 or 84x84?
   policy: 'CnnPolicy'
   n_timesteps: !!float 5e6
   buffer_size: 10000
-  learning_rate: !!float 1e-4
+  learning_rate: !!float 1e-4 #0.0025?
   learning_starts: 10000
-  target_network_update_freq: 4000 #prima era 2000
+  target_network_update_freq: 4000 #100?
   train_freq: 4
   exploration_final_eps: 0.01
   exploration_fraction: 0.2 #prima era 0.1
   prioritized_replay_alpha: 0.6
   prioritized_replay: True
   double_q: True
+# gamma: 0.2 ??
 
  
 CameraReach-v1:
