@@ -11,4 +11,5 @@ trained_agents/
 .git/
 .pytype/
 experiments/
+.experiments/
 new_scripts/
