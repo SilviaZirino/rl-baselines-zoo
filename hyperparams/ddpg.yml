@@ -84,3 +84,25 @@ HopperBulletEnv-v0:
   critic_lr: 0.00156
   normalize_observations: True
   normalize_returns: False
+
+
+CameraReach-v0:
+  n_timesteps: !!float 5e6
+  policy: 'CnnPolicy'
+  gamma: 0.99
+  memory_limit: 10000 #200000 #from article: 1000000 #10000
+  noise_type: 'ornstein-uhlenbeck'
+  noise_std: 0.2 #0.5?
+  batch_size: 100 #256 #minibatch? (from article 16 minibatches)
+  normalize_observations: True
+  normalize_returns: True
+  env_wrapper: RGBobs_ddpg.RGBobs
+  actor_lr: 0.0001 #from article: 0.0001
+  critic_lr: 0.001
+  critic_l2_reg: 0.01
+  random_exploration: 0.0 #used with DDPG+HER
+#minibatch=16 not included?? 
+#starts learning after 1000 steps 
+
+
+
