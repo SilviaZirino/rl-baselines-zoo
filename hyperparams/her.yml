@@ -141,3 +141,24 @@ FetchReachDense-v1:
   gamma: 0.95
   learning_rate: !!float 1e-3
   batch_size: 256
+
+
+CameraReach-v0: #with modified action space
+  n_sampled_goal: 4
+  goal_selection_strategy: 'future'
+  model_class: 'dqn' #'ddpg'
+  policy: 'CnnPolicy'
+  env_wrapper: RGBobs.RGBobs
+  n_timesteps: !!float 5e6
+  buffer_size: 10000
+  learning_rate: !!float 1e-4
+  learning_starts: 10000
+  target_network_update_freq: 4000 #prima era 2000
+  train_freq: 4
+  exploration_final_eps: 0.01
+  exploration_fraction: 0.2 #prima era 0.1
+  prioritized_replay_alpha: 0.6
+  prioritized_replay: True
+  double_q: True
+
+
