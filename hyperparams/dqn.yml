@@ -63,7 +63,7 @@ Toy2D-v0:
 
 
 CameraReach-v0:  #TOGLIERE DOUBLE, DUELLING AND PRIORITIZED REPLAY PER CONFRONTARLO CON QUELLO DI SB3
-  env_wrapper: RGBobs_ddpg.RGBobs #64x64 or 84x84?
+  env_wrapper: RGBobs.RGBobs #64x64 or 84x84?
   policy: 'CnnPolicy'
   n_timesteps: !!float 5e6
   buffer_size: 10000
