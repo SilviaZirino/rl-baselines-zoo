@@ -35,7 +35,7 @@ def main():
     parser.add_argument('-f', '--folder', help='Log folder', type=str, default='trained_agents')
     parser.add_argument('--algo', help='RL Algorithm', default='ppo2',
                         type=str, required=False, choices=list(ALGOS.keys()))
-    parser.add_argument('-n', '--n-timesteps', help='number of timesteps', default=1200,
+    parser.add_argument('-n', '--n-timesteps', help='number of timesteps', default=305, #305(DQN before); otherwise 295
                         type=int)
     parser.add_argument('--n-envs', help='number of environments', default=1,
                         type=int)
@@ -156,10 +156,6 @@ def main():
         episode_reward += reward[0]
         ep_len += 1
 
-#------------------------------------------------------------------------
-        #if ep_len == 61: #without that, done is not called when the maximum number of episodes is reached
-        #    done = True
-#-------------------------------------------------------------------------
 
         if args.n_envs == 1:
             # For atari the return reward is not the atari score
@@ -185,19 +181,28 @@ def main():
                 ep_len = 0
 
             # Reset also when the goal is achieved when using HER
-            if done or infos[0].get('is_success', False):
-                if args.algo == 'her' and args.verbose > 1:
-                    print("Success?", infos[0].get('is_success', False))
+            if done: #or infos[0].get('is_success', False):
+                #if args.algo == 'her' and args.verbose > 1:
+                print("Success?", infos[0].get('is_success', False))
                 # Alternatively, you can add a check to wait for the end of the episode
-                # if done:
-                obs = env.reset()
-                if args.algo == 'her':
+                if done:
+                    obs = env.reset()
                     successes.append(infos[0].get('is_success', False))
                     episode_reward = 0.0
                     ep_len = 0
+                    if args.algo == 'her':
+                        successes.append(infos[0].get('is_success', False))
+                        episode_reward = 0.0
+                        ep_len = 0
 
 #-----------------------------------------------------------------------------------------------------------------
-    imageio.mimsave('dVRL_dqn.gif', [np.array(img) for i, img in enumerate(images) if i%2 == 0], fps=10) #fps was 29
+    imagesLR = np.fliplr(images)
+    imagesUD = np.flipud(images)
+    imagesUDLR = np.flipud(np.fliplr(images))
+    imageio.mimsave('dVRL_dqn_denseLR_5ep.gif', [np.array(img) for i, img in enumerate(imagesLR) if i%2 == 0], fps=10) #fps was 29
+    imageio.mimsave('dVRL_dqn_denseUD_5ep.gif', [np.array(img) for i, img in enumerate(imagesUD) if i%2 == 0], fps=10) #fps was 29
+    imageio.mimsave('dVRL_dqn_denseUDLR_5ep.gif', [np.array(img) for i, img in enumerate(imagesUDLR) if i%2 == 0], fps=10) #fps was 29
+    imageio.mimsave('dVRL_dqn_denseNORMAL_5ep.gif', [np.array(img) for i, img in enumerate(images) if i%2 == 0], fps=10) #fps was 29
 #------------------------------------------------------------------------------------------------------------------
 
     if args.verbose > 0 and len(successes) > 0:
